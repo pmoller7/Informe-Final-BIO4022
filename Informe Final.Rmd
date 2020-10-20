@@ -1,5 +1,5 @@
 ---
-title: "Informe FInal"
+title: "Análisis de series de tiempo de dos índices de vegetación en un Humedal Costero de la región del Biobío"
 author: "Paulina Möller"
 date: "14-10-2020"
 output: 
@@ -172,7 +172,7 @@ res2 <-cor.test(P2_NDVI_EVI$NDVI, P2_NDVI_EVI$EVI,  method = "spearman")
 
 ```
 
-Ademas, si bien EVI presenta una distribución normal, NDVI presenta una distribución asimétrica hacia los valores más altos (figura \@ref(fig:histograma) y figura \@ref(fig:normalidad)). Por lo cual para evaluar la relación entre ambos indices se decidio hacer una correlación no paramétrica de Spearman. La cual mostró una alta correlación (rho = `r round(res2$estimate, digits = 2)`) estadísticamente significativa (p =`r round(res2$p.value, digits = 2)`) (Figura \@ref(fig:Correlacion))  
+Ademas, si bien EVI presenta una distribución normal, NDVI presenta una distribución asimétrica hacia los valores más altos (figura \@ref(fig:histograma) y figura \@ref(fig:normalidad). Por lo cual para evaluar la relación entre ambos indices se decidió hacer una correlación no paramétrica de Spearman. La cual mostró una alta correlación (rho = `r round(res2$estimate, digits = 2)`) estadísticamente significativa (p =`r round(res2$p.value, digits = 2)`) (Figura \@ref(fig:Correlacion))  
 
 ```{r histograma, fig.width=8, fig.height=4,  fig.cap="Histograma de EVI y NDVI"}
 par(mfrow = c(1, 2))
@@ -204,7 +204,7 @@ ggplot(P2_NDVI_EVI,aes(y=P2_NDVI_EVI$NDVI,x=P2_NDVI_EVI$EVI))+geom_point()+geom_
 
 ```
 
-Las estimaciones mensuales de los índices de vegetación NDVI y EVI se intentaron explicar a partir de mediciones mensuales de temperatura y precipitación mediante regresiones lineales. El modelo 1 evaluó solo precipitación, el modelo 2 solo temperatura y el modelo 3 evaluó ambas variables (tablas \@ref(tab:Modelos_EVI) y \@ref(tab:Modelos_NDVI)). Se observó que temperatura y precipitación explican un porcentaje muy bajo de la varianza de NDVI y EVI
+Las estimaciones mensuales de los índices de vegetación NDVI y EVI se intentaron explicar a partir de mediciones mensuales de temperatura y precipitación mediante regresiones lineales. El modelo 1 evaluó solo precipitación, el modelo 2 solo temperatura y el modelo 3 evaluó ambas variables (tablas \@ref(tab:Modelos1) y \@ref(tab:Modelos2)). Se observó que temperatura y precipitación explican un porcentaje muy bajo de la varianza de NDVI y EVI
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, error = FALSE, include=FALSE}
 ppyt <- data.frame(read_excel("Data.xlsx"))
@@ -228,7 +228,7 @@ Modelo2_NDVI <- glance(Fit2_NDVI) %>% dplyr::select(r.squared,
 Modelo3_NDVI <- glance(Fit3_NDVI) %>% dplyr::select(r.squared, 
                                                     AIC) %>% mutate(Modelo = "Fit3")
 
-Modelos_NDVI <- bind_rows(Modelo1_NDVI, Modelo2_NDVI, Modelo3_NDVI) %>% arrange(AIC) %>% mutate(DeltaAIC = AIC - 
+Modelos2 <- bind_rows(Modelo1_NDVI, Modelo2_NDVI, Modelo3_NDVI) %>% arrange(AIC) %>% mutate(DeltaAIC = AIC - 
                                                                                                   min(AIC)) %>% select(Modelo, r.squared, AIC, DeltaAIC)
 
 
@@ -240,22 +240,22 @@ Modelo3_EVI <- glance(Fit3_EVI) %>% dplyr::select(r.squared,
                                                   AIC) %>% mutate(Modelo = "Fit3")
 
 
-Modelos_EVI <- bind_rows(Modelo1_EVI, Modelo2_EVI, Modelo3_EVI) %>% arrange(AIC) %>% mutate(DeltaAIC = AIC - 
+Modelos1 <- bind_rows(Modelo1_EVI, Modelo2_EVI, Modelo3_EVI) %>% arrange(AIC) %>% mutate(DeltaAIC = AIC - 
                                                                                               min(AIC)) %>% select(Modelo, r.squared, AIC, DeltaAIC)
 
 
 
 ```
 
-```{r Modelos_EVI, echo = F, message = F, warning = F, fig.cap = Modelos_EVI}
+```{r Modelos1, echo = F, message = F, warning = F, fig.cap = Modelos2}
 
-knitr::kable(Modelos_EVI, digits = 2, caption = "Regresión lineal de EVI y precipitación (fit1), temperatura (fit2) y temperatura y precipitación (fit3)", full_width = F)
+knitr::kable(Modelos1, digits = 2, caption = "Regresión lineal de EVI y precipitación (fit1), temperatura (fit2) y temperatura y precipitación (fit3)", full_width = F)
 ```
 
 
-```{r Modelos_NDVI, echo = F, message = F, warning = F, fig.cap = Modelos_NDVI}
+```{r Modelos2, echo = F, message = F, warning = F, fig.cap = Modelos2}
 
-knitr::kable(Modelos_NDVI, digits = 2, caption = "Regresión lineal de NDVI y precipitación (fit1), temperatura (fit2) y temperatura y precipitación (fit3)", full_width = F)
+knitr::kable(Modelos2, digits = 2, caption = "Regresión lineal de NDVI y precipitación (fit1), temperatura (fit2) y temperatura y precipitación (fit3)", full_width = F)
 ```
 
 
@@ -290,18 +290,18 @@ plot(stl_ts_P2_NDVI, main= "Sitio 2",
 # Conclusión
 
 
-El análisis temporal de los índices de vegetación NDVI y EVI estimados en el Humedal Carampangue muestran que, si bien los índices de vegetación NDVI y EVI presentan una alta relación no lineal, se registraron valores de NDVI que prácticamente duplican las estimaciones de EVI. Estas diferencias en estimación pueden deberse a que, si bien NDVI considera los efectos topográficos en términos de la reflectividad (lo que resulta importante en áreas montañosas), EVI reduce los efectos adversos de factores ambientales como las condiciones atmosféricas y el fondo del suelo (Holben & Justice, 1991). Si bien, aunque ambos índices están altamente correlacionados y registran los mismos cambios temporales, considerando que el área de estudio es una zona baja y plana y que EVI considera las condiciones ambientales y de fondo de suelo, pareciera más adecuado utilizar este índice de vegetación para estudios fenológicos.
-Se registró también que la precipitación y la temperatura explicaron un porcentaje muy bajo de la variación observada en ambos índices, esto probablemente porque al ser una zona muy lluviosa puede existir un desacoplé entre la lluvia y la vegetación. 
-Por último, se observa que previo al terremoto ambos índices registran una estacionalidad marcada. Esto puede tener distintas explicaciones, por un lado, al haber mayor cantidad de agua en el humedal durante el invierno las características espectrales del agua hacen que la mayor parte de las longitudes de onda sean absorbidas obteniendo así valores de NDVI más bajos. Por otro lado, efectivamente durante el invierno el verdor podría estar disminuyendo, ya sea por una sucesión de especies halo tolerantes en el verano a dulceacuícolas en el invierno o a que la misma especies presenta cambios estacionales de verdor. Este humedal se encuentra dominado por la especie halófita facultativa Spartina densiflora (Fariña y cols., 2018), estudios en especies de Spartina alterniflora y Spartina foliosa encontraron que ambas especies comienzan a florecer a mediados del verano, con un máximo de su biomasa a mediados de otoño y senescencia a finales de otoño (Callaway & Josselyn, 1992), lo que explicaría la estacionalidad observada en ambos índices. Posterior a la ocurrencia del terremoto se observa una disminución de la estacionalidad observada y un aumento de la tendencia (la cual comienza a aumentar aproximadamente 1 año antes del terremoto), esto puede relacionarse son una posible sucesión vegetacional de especies halo tolerantes estacionales como Spartina densiflora, por especies más terrestre o de agua dulce más perennes, debido a que estudios han registrado que posterior a alzamientos cosismicos se pueden generar condiciones de sequía y pérdida del régimen de marea al interior de humedales costeros, generándose así una sucesión vegetacional desde vegetación halotolerantes a vegetación de agua dulce o terrestre (Valdovinos et al., 2010 ; Thilenius, 1996; Boggs & Shephard, 1999; Reid et al., 2017). Aún así, para concluir esto de manera robusta hacen falta muestreos in situ y el uso de imágenes satelitales de mayor resolución espacial.
+El análisis temporal de los índices de vegetación NDVI y EVI estimados en el Humedal Carampangue muestran que, si bien los índices de vegetación NDVI y EVI presentan una alta relación no lineal  y registran los mismos cambios temporales, se registraron valores de NDVI que prácticamente duplican las estimaciones de EVI. Estas diferencias en estimación pueden deberse a que, si bien NDVI considera los efectos topográficos en términos de la reflectividad (lo que resulta importante en áreas montañosas), EVI reduce los efectos adversos de factores ambientales como las condiciones atmosféricas y el fondo del suelo (Holben & Justice, 1991), por lo que, considerando que el área de estudio es una zona baja y plana y que EVI considera las condiciones ambientales y de fondo de suelo, pareciera más adecuado utilizar este índice de vegetación para estudios fenológicos.
+Se registró también que la precipitación y la temperatura explicaron un porcentaje muy bajo de la variación observada en ambos índices, esto probablemente porque al ser una zona muy lluviosa puede existir un desacoplé entre la lluvia y la vegetación. Por lo que deben existir otros factores que expliquen de manera mas fuerte los cambios observados en la vegetación.
+Por último, se observa que previo al terremoto ambos índices registran una estacionalidad marcada. Esto puede tener distintas explicaciones, por un lado, al haber mayor cantidad de agua en el humedal durante el invierno las características espectrales del agua hacen que la mayor parte de las longitudes de onda sean absorbidas obteniendo así valores de NDVI y EVI más bajos. Por otro lado, efectivamente durante el invierno el verdor podría estar disminuyendo, ya sea por una sucesión de especies halo tolerantes en el verano a dulceacuícolas en el invierno o a que la misma especies presenta cambios estacionales de verdor. Este humedal se encuentra dominado por la especie halófita facultativa Spartina densiflora (Fariña y cols., 2018), estudios en especies de Spartina alterniflora y Spartina foliosa encontraron que ambas especies comienzan a florecer a mediados del verano, con un máximo de su biomasa a mediados de otoño y senescencia a finales de otoño (Callaway & Josselyn, 1992), lo que explicaría la estacionalidad observada en ambos índices. Posterior a la ocurrencia del terremoto se observa una disminución de la estacionalidad observada y un aumento de la tendencia (la cual comienza a aumentar aproximadamente 1 año antes del terremoto), esto puede relacionarse son una posible sucesión vegetacional de especies halo tolerantes estacionales como Spartina densiflora, por especies más terrestre o de agua dulce más perennes, debido a que estudios han registrado que posterior a alzamientos cosismicos se pueden generar condiciones de sequía y pérdida del régimen de marea al interior de humedales costeros, generándose así una sucesión vegetacional desde vegetación halotolerantes a vegetación de agua dulce o terrestre (Valdovinos et al., 2010 ; Thilenius, 1996; Boggs & Shephard, 1999; Reid et al., 2017). Aún así, para concluir esto de manera robusta hacen falta muestreos in situ y el uso de imágenes satelitales de mayor resolución espacial.
 
 # Referencias
-- 
+
 - Attrill, M. J., & Rundle, S. D. (2002). Ecotone or ecocline: ecological boundaries in estuaries. Estuarine, Coastal and Shelf Science, 55(6), 929-936.
 - Boggs K. & Shephard M. (1999). Response of marine deltaic surfaces to major earthquake uplifts in southcentral Alaska. Wetlands, 19(1), 13-27.
 - Callaway, J. C., & Josselyn, M. N. (1992). The introduction and spread of smooth cordgrass (Spartina alterniflora) in South San Francisco Bay. Estuaries, 15(2), 218-226. 
 - Dong Z., Wang Z., Liu D., Song K., Li L., Jia M. y Ding Z. (2014)  Mapping wetland areas using landsat-derived ndvi and lswi: A case study of west Songnen plain, Northeast China. Journal of the Indian Society of Remote Sensing. 42, 569–576
 - EULA. (2011). Diagnóstico y propuesta para la conservación y uso sustentable de los humedales lacustres y urbanos principales de la región del Biobío. Propuesta metodológica para el manejo y gestión para los humedales de la región del Biobío. Universidad de Concepción. Concepción, Chile
-- Fagherazzi, S., Kirwan, M. L., Mudd, S. M., Guntenspergen, G. R., Temmerman, S., D'Alpaos, A., van de Koppel, J., Rybczyk, J., Reyes, E., Craft C. & Clough, J. (2012). Numerical models of salt marsh evolution: Ecological, geomorphic, and climatic factors. Reviews of Geophysics, 50(1).
+- Fagherazzi, S., Kirwan, M. L., Mudd, S. M., Guntenspergen, G. R., Temmerman, S., D Alpaos, A., van de Koppel, J., Rybczyk, J., Reyes, E., Craft C. & Clough, J. (2012). Numerical models of salt marsh evolution: Ecological, geomorphic, and climatic factors. Reviews of Geophysics, 50(1).
 - Holben, B., & Justice, C. (1981). An examination of spectral band ratioing to reduce the topographic effect on remotely sensed data. International journal of remote sensing, 2(2), 115-133.
 - Lefeuvre, J. C., Bouchard, V., Feunteun, E., Grare, S., Laffaille, P., & Radureau, A. (2000). European salt marshes diversity and functioning: the case study of the Mont Saint-Michel bay, France. Wetlands Ecology and Management, 8(2-3), 147-161.
 - Mitsch, W. J., & Gosselink, J. G. (2007). Wetlands. Hoboken. ed: John Wiley & Sons, Inc.
@@ -309,26 +309,7 @@ Por último, se observa que previo al terremoto ambos índices registran una est
 - Reid C., Cochran U., Clark K., Marsden I., Litchfield N., & Ries W. (2017). Salt marsh plant response to vertical deformation resulting from the February 2011 Christchurch earthquake. New Zealand Journal of Geology and Geophysics, 60(3), 220-238.
 - Thilenius F. (1996). Phytosociology and succession on earthquake-uplifted coastal wetlands, Copper River Delta, Alaska. Oceanographic Literature Review, 3(43), 288.
 - Valdovinos, C., Muñoz, M. D., Sandoval, N., Vásquez, D., & Olmos, V. (2010). Desastres naturales y biodiversidad: el caso del humedal costero Tubul-Raqui.
-- Vigny C., Socquet A., Peyrat S., Ruegg J.C., Métois M., Madariaga R., Morvan S., Lancieri M., Lacassin R., Campos J., Carrizo D., Bejar-Pizarro M., Barrientos S., Armijo R., Aranda C., Valderas-Bermejo M.C., Ortega I., Bondoux F., Baize S., Lyon-C., Pavez A., Vilotte J.P., Bevis M., Brooks B., Smalley R., Parra H., Baez J.C., Blanco M., Cimbaro S. y Kendrick E. (2011). The 2010 Mw 8.8 Maule megathrust earthquake of central Chile, monitored by GPS, Science. 332, 1417–1421.
+- Vigny C., Socquet A., Peyrat S., Ruegg J.C., Métois M., Madariaga R., Morvan S., Lancieri M., Lacassin R., Campos J., Carrizo D., Bejar-Pizarro M., Barrientos S., Armijo R., Aranda C., Valderas Bermejo M.C., Ortega I., Bondoux F., Baize S., Lyon-C., Pavez A., Vilotte J.P., Bevis M., Brooks B., Smalley R., Parra H., Baez J.C., Blanco M., Cimbaro S. y Kendrick E. (2011). The 2010 Mw 8.8 Maule megathrust earthquake of central Chile, monitored by GPS, Science. 332, 1417–1421.
 - White M., Nemani R. (2006) Real-time monitoring and short-term forecasting of land surface phenology. Remote Sens. Environ, 104, 43–49.
 - Xie, Y.C., Sha, Z.Y. & Yu, M. (2008). Remote sensing imagery in vegetation mapping: areview. J. Plant Ecol. 1, 9–23.
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
